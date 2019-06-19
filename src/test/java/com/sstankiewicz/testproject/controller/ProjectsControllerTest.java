@@ -46,8 +46,7 @@ public class ProjectsControllerTest {
 	@Test
 	public void testNonexistentUser() {
 		String userName = "invalid_user";
-		assertThat(getResponse(HttpMethod.GET, endpointUrl + userName).getStatusCode())
-				.isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(getResponse(HttpMethod.GET, endpointUrl + userName).getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
 	@Test
@@ -61,14 +60,12 @@ public class ProjectsControllerTest {
 
 		assertThat(responseJson.path("user").asText()).isEqualTo(userName);
 		assertThat(responseJson.path("projects").asInt()).isEqualTo(1);
-		assertThat(response.getHeaders().getContentType().getType())
-				.isEqualTo(APPLICATION_JSON.getType());
+		assertThat(response.getHeaders().getContentType().getType()).isEqualTo(APPLICATION_JSON.getType());
 	}
 
 	@Test
 	public void testEmptyUser() {
-		assertThat(getResponse(HttpMethod.GET, endpointUrl).getStatusCode())
-				.isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(getResponse(HttpMethod.GET, endpointUrl).getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
 	@Test
