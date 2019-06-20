@@ -4,21 +4,20 @@ import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.Optional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(MockitoJUnitRunner.class)
 public class ProjectsServiceImplTest {
 
 	private ProjectsService projectsService;
 
-	@MockBean private GithubApiProxy githubApiProxy;
+	@Mock
+	private GithubApiProxy githubApiProxy;
 
 	@Before
 	public void setUp() {

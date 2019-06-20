@@ -12,9 +12,4 @@ public class TestProjectApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TestProjectApplication.class, args);
 	}
-
-	@Bean
-	public RestTemplate restTemplate(RestTemplateBuilder builder) {
-		return builder.build();
-	}
 }

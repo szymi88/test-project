@@ -4,7 +4,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -17,13 +20,13 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(MockitoJUnitRunner.class)
 public class GithubApiProxyImplTest {
 
 	private GithubApiProxy githubApiProxy;
 
-	@MockBean private RestTemplate restTemplate;
+	@Mock
+	private RestTemplate restTemplate;
 
 	@Before
 	public void setUp() {

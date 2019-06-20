@@ -20,15 +20,12 @@ public class TestProjectApplicationTests {
 
 	@Autowired private ProjectsService projectsService;
 
-	@Autowired private RestTemplate restTemplate;
-
 	@Autowired private GithubApiProxy githubApiProxy;
 
 	@Test
 	public void contextLoads() {
 		assertThat(controller).isNotNull();
 		assertThat(projectsService).isNotNull();
-		assertThat(restTemplate).isNotNull();
 		assertThat(githubApiProxy).isNotNull();
 	}
 }

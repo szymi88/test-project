@@ -1,88 +1,89 @@
 package com.sstankiewicz.testproject.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sstankiewicz.testproject.service.ProjectsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.io.IOException;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@WebMvcTest(ProjectsController.class)
 public class ProjectsControllerTest {
 
-	@LocalServerPort private int port;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@Autowired private TestRestTemplate restTemplate;
+    @MockBean
+    private ProjectsService projectsServiceMock;
 
-	@MockBean private ProjectsService projectsServiceMock;
+    private String endpointUrl;
 
-	private String endpointUrl;
+    @Before
+    public void setUp() {
+        endpointUrl = "/projects/";
 
-	@Before
-	public void setUp() {
-		endpointUrl = "http://localhost:" + port + "/projects/";
+        Mockito.when(projectsServiceMock.getProjectsCount("valid_user")).thenReturn(Optional.of(1));
+        Mockito.when(projectsServiceMock.getProjectsCount("invalid_user")).thenReturn(Optional.empty());
+    }
 
-		Mockito.when(projectsServiceMock.getProjectsCount("valid_user")).thenReturn(Optional.of(1));
-		Mockito.when(projectsServiceMock.getProjectsCount("invalid_user")).thenReturn(Optional.empty());
-	}
+    @Test
+    public void testNonexistentUser() throws Exception {
+        String userName = "invalid_user";
 
-	@Test
-	public void testNonexistentUser() {
-		String userName = "invalid_user";
-		assertThat(getResponse(HttpMethod.GET, endpointUrl + userName).getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-	}
+        mockMvc.perform(MockMvcRequestBuilders.get(endpointUrl + userName))
+                .andExpect(status().isNotFound());
+    }
 
-	@Test
-	public void testExistentUser() throws IOException {
-		String userName = "valid_user";
-		ResponseEntity<String> response = getResponse(HttpMethod.GET, endpointUrl + userName);
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode responseJson = mapper.readTree(response.getBody());
+    @Test
+    public void testExistentUser() throws Exception {
+        String userName = "valid_user";
 
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        mockMvc.perform(MockMvcRequestBuilders.get(endpointUrl + userName))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("user").value(userName))
+                .andExpect(jsonPath("projects").value(1))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
 
-		assertThat(responseJson.path("user").asText()).isEqualTo(userName);
-		assertThat(responseJson.path("projects").asInt()).isEqualTo(1);
-		assertThat(response.getHeaders().getContentType().getType()).isEqualTo(APPLICATION_JSON.getType());
-	}
+    @Test
+    public void testEmptyUser() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(endpointUrl))
+                .andExpect(status().isNotFound());
+    }
 
-	@Test
-	public void testEmptyUser() {
-		assertThat(getResponse(HttpMethod.GET, endpointUrl).getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-	}
+    @Test
+    public void testUnsupportedMethods() throws Exception {
+        String userName = "valid_user";
 
-	@Test
-	public void testUnsupportedMethods() {
-		String userName = "valid_user";
+        mockMvc.perform(MockMvcRequestBuilders.post(endpointUrl + userName))
+                .andExpect(status().isMethodNotAllowed());
 
-		assertThat(getResponse(HttpMethod.POST, endpointUrl + userName).getStatusCode())
-				.isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
-		assertThat(getResponse(HttpMethod.PUT, endpointUrl + userName).getStatusCode())
-				.isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
-		assertThat(getResponse(HttpMethod.DELETE, endpointUrl + userName).getStatusCode())
-				.isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
-		assertThat(getResponse(HttpMethod.TRACE, endpointUrl + userName).getStatusCode())
-				.isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
-	}
+        mockMvc.perform(MockMvcRequestBuilders.put(endpointUrl + userName))
+                .andExpect(status().isMethodNotAllowed());
 
-	private ResponseEntity<String> getResponse(HttpMethod httpMethod, String url) {
-		return restTemplate.exchange(url, httpMethod, null, String.class);
-	}
+        mockMvc.perform(MockMvcRequestBuilders.delete(endpointUrl + userName))
+                .andExpect(status().isMethodNotAllowed());
+
+    }
+
+    @Test
+    public void testServiceError() throws Exception {
+        Mockito.when(projectsServiceMock.getProjectsCount("cause-exception")).thenThrow(new RuntimeException());
+
+        mockMvc.perform(MockMvcRequestBuilders.get(endpointUrl + "cause-exception"))
+                .andExpect(status().is5xxServerError());
+
+    }
 }
