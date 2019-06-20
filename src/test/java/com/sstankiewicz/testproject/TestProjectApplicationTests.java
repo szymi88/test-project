@@ -1,5 +1,6 @@
 package com.sstankiewicz.testproject;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ public class TestProjectApplicationTests {
 
 	@Test
 	public void contextLoads() {
+
 	}
 
 }

@@ -1,0 +1,53 @@
+version: "1.0"
+stages:
+  - "clone"
+  - "build"
+  - "integration"
+  - "push"
+  - "deploy"
+steps:
+  main_clone:
+    type: "git-clone"
+    description: "Cloning main repository..."
+    repo: "szymi88/test-project"
+    revision: "${{CF_BRANCH}}"
+    stage: "clone"
+  create_builder:
+    title: "Creaiting Maven Build Docker"
+    type: "build"
+    image_name: "szymi88/builder"
+    tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
+    dockerfile: "Dockerfile.build"
+    stage: "build"
+  run_jar_build:
+    title: Building App
+    image: "${{create_builder}}"
+    stage: "build"
+    commands:
+      - mvn package
+  build:
+    title: "Building Docker Image"
+    type: "build"
+    image_name: "szymi88/teletronics-test-project"
+    tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
+    dockerfile: "Dockerfile"
+    stage: "build"
+  push:
+    type: push
+    title: Pushing to Dockerhub
+    candidate: ${{build}}
+    tag: latest
+    image_name: szymi88/teletronics-test-project
+    registry: teletronics-test-project
+    stage: "push"
+  create_deployer:
+    title: "Building deployment docker"
+    type: "build"
+    image_name: "szymi88/deployer"
+    tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
+    dockerfile: "Dockerfile.deploy"
+    stage: "deploy"
+  deploy:
+    title: Dploying to EC2
+    image: "${{create_deployer}}"
+    stage: "deploy"

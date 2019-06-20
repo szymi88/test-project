@@ -1,0 +1,9 @@
+FROM arvindr226/alpine-ssh
+
+COPY ./update-image.sh /
+COPY ./szymi.pem /
+COPY ./run-image-pull.sh /
+RUN ["chmod", "+x", "update-image.sh"]
+RUN ["chmod", "+x", "run-image-pull.sh"]
+
+ENTRYPOINT [ "bash", "run-image-pull.sh" ]

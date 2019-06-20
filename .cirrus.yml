@@ -1,14 +1,19 @@
-task:
-  name: test
+build_task:
   container:
-    image: maven:latest
+    image: maven:3.6.1-jdk-12
   maven_cache:
     folder: ~/.m2
-  test_script: mvn test -B
-task:
-  name: build
-  container:
-    image: maven:latest
-  maven_cache:
-    folder: ~/.m2
-  test_script: mvn package -B
+  build_script: mvn package -B
+  binaries_artifacts:
+    path: "target/*"
+docker_builder:
+  depends_on:
+    - build
+  env:
+    DOCKER_USERNAME: ENCRYPTED[35e111e741d77f06dfeae916a5e1f5f2f02899d44c8d1866efdd2d7e3c66ca48678168085e8afaa15e1a2127f773ecc5]
+    DOCKER_PASSWORD: ENCRYPTED[31f6ed8c62c67be50b009f68d766dfdc727d09829e9d3680fe2342a0ca8f2997d256687273718871dec2a0d017a3e230]
+  log_script: ls -l .
+  log2_script: pwd
+  build_script: docker build --tag test-app .
+  login_script: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+  push_script: docker push szymi88/teletronics-test-project:test-app
