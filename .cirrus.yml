@@ -1,0 +1,14 @@
+task:
+  name: test
+  container:
+    image: maven:latest
+  maven_cache:
+    folder: ~/.m2
+  test_script: mvn test -B
+task:
+  name: build
+  container:
+    image: maven:latest
+  maven_cache:
+    folder: ~/.m2
+  test_script: mvn package -B
