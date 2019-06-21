@@ -1,6 +1,8 @@
 version: "1.0"
 stages:
   - "clone"
+  -	"build-tools"
+  - "test"
   - "build"
   - "integration"
   - "push"
@@ -18,13 +20,26 @@ steps:
     image_name: "szymi88/builder"
     tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
     dockerfile: "Dockerfile.build"
-    stage: "build"
-  run_jar_build:
+    stage: "build-tools"
+  create_deployer:
+    title: "Building deployment docker"
+    type: "build"
+    image_name: "szymi88/deployer"
+    tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
+    dockerfile: "Dockerfile.deploy"
+    stage: "build-tools"
+  test:
+    title: Running Tests
+    image: "${{create_builder}}"
+    stage: "test"
+    commands:
+      - mvn test
+  package_build:
     title: Building App
     image: "${{create_builder}}"
     stage: "build"
     commands:
-      - mvn package
+      - mvn package -Dmaven.test.skip=true
   build:
     title: "Building Docker Image"
     type: "build"
@@ -40,13 +55,6 @@ steps:
     image_name: szymi88/teletronics-test-project
     registry: teletronics-test-project
     stage: "push"
-  create_deployer:
-    title: "Building deployment docker"
-    type: "build"
-    image_name: "szymi88/deployer"
-    tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
-    dockerfile: "Dockerfile.deploy"
-    stage: "deploy"
   deploy:
     title: Dploying to EC2
     image: "${{create_deployer}}"
