@@ -19,14 +19,14 @@ steps:
     type: "build"
     image_name: "szymi88/builder"
     tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
-    dockerfile: "Dockerfile.build"
+    dockerfile: "ci-tools/Dockerfile.build"
     stage: "build-tools"
   create_deployer:
     title: "Building deployment docker"
     type: "build"
     image_name: "szymi88/deployer"
     tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
-    dockerfile: "Dockerfile.deploy"
+    dockerfile: "ci-tools/Dockerfile.deploy"
     stage: "build-tools"
   test:
     title: Running Tests

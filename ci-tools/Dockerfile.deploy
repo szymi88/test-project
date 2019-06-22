@@ -1,10 +1,11 @@
 FROM arvindr226/alpine-ssh
 
 ARG DEPLOY_SCRIPTS_DIR=./ci-tools
-COPY ${DEPLOY_SCRIPTS_DIR}/update-image.sh /
-COPY ${DEPLOY_SCRIPTS_DIR}/szymi.pem /
-COPY ${DEPLOY_SCRIPTS_DIR}/run-image-pull.sh /
-RUN ["chmod", "+x", "update-image.sh"]
-RUN ["chmod", "+x", "run-image-pull.sh"]
 
-ENTRYPOINT [ "bash", "run-image-pull.sh" ]
+ADD ${DEPLOY_SCRIPTS_DIR} /opt/${DEPLOY_SCRIPTS_DIR}
+WORKDIR /opt/${DEPLOY_SCRIPTS_DIR}
+
+RUN ["chmod", "+x", "update-image.sh"]
+RUN ["chmod", "+x", "init-deployment.sh"]
+
+ENTRYPOINT ["bin/bash" "ci-tools/init-deployment.sh"]
