@@ -1,4 +1,6 @@
-FROM arvindr226/alpine-ssh
+FROM alpine:3.7
+
+RUN apk add --no-cache openssh
 
 ARG DEPLOY_SCRIPTS_DIR=./ci-tools
 
@@ -6,6 +8,6 @@ ADD ${DEPLOY_SCRIPTS_DIR} /opt/${DEPLOY_SCRIPTS_DIR}
 WORKDIR /opt/${DEPLOY_SCRIPTS_DIR}
 
 RUN ["chmod", "+x", "update-image.sh"]
-RUN ["chmod", "+x", "init-deployment.sh"]
+RUN chmod 400 /opt/ci-tools/szymi.pem
 
-ENTRYPOINT ["bin/bash" "ci-tools/init-deployment.sh"]
+ENTRYPOINT ssh -o StrictHostKeyChecking=no -i /opt/ci-tools/szymi.pem ec2-user@ec2-34-244-51-218.eu-west-1.compute.amazonaws.com < /opt/ci-tools/update-image.sh
