@@ -17,17 +17,17 @@ public class ProjectsServiceImplTest {
 	private ProjectsService projectsService;
 
 	@Mock
-	private GithubApiProxy githubApiProxy;
+	private RestConsumer restConsumer;
 
 	@Before
 	public void setUp() {
 
-		projectsService = new ProjectsServiceImpl(githubApiProxy);
+		projectsService = new ProjectsServiceImpl(restConsumer);
 
-		Mockito.when(githubApiProxy.getUserRepositories("valid-user"))
+		Mockito.when(restConsumer.getUserRepositories("valid-user"))
 				.thenReturn(Optional.of(Collections.singletonList(new Object())));
 
-		Mockito.when(githubApiProxy.getUserRepositories("invalid-user"))
+		Mockito.when(restConsumer.getUserRepositories("invalid-user"))
 				.thenReturn(Optional.empty());
 	}
 
