@@ -5,6 +5,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Bean source for the {@code RestTemplate}
+ *
+ * @author sstankiewicz
+ */
 @Configuration
 public class RestTemplateConfuguration {
     @Bean

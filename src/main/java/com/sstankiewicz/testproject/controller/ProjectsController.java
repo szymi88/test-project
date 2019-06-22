@@ -13,6 +13,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
+/**
+ * REST API controller
+ *
+ * @author sstankiewicz
+ */
 @RestController
 @RequestMapping("/projects")
 public class ProjectsController {

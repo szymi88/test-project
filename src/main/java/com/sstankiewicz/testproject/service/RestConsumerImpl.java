@@ -17,6 +17,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+
+/**
+ * This class is responsible for connecting to the configured REST API and obtain users repositories.
+ *
+ * @author sstankiewicz
+ */
 @Service
 public class RestConsumerImpl implements RestConsumer {
 
@@ -32,6 +38,17 @@ public class RestConsumerImpl implements RestConsumer {
         this.apiUrlPattern = apiUrlPattern;
     }
 
+
+    /**
+     * Returns list of users repositories.
+     *
+     * Uses the REST API configured in application.properties as: {git.repos.api.pattern}
+     *
+     * @param user id
+     * @return the list of user's repositories or an empty {@code Optional}
+     * if the user was not found.
+     * @throws ConfigurationException if configured API url returns code different than 200 or 404
+     */
     public Optional<List> getUserRepositories(String user) throws ConfigurationException {
         URI url;
         try {
