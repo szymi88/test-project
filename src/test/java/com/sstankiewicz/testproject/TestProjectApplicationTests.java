@@ -1,14 +1,13 @@
 package com.sstankiewicz.testproject;
 
 import com.sstankiewicz.testproject.controller.ProjectsController;
-import com.sstankiewicz.testproject.service.GithubApiProxy;
+import com.sstankiewicz.testproject.service.RestConsumer;
 import com.sstankiewicz.testproject.service.ProjectsService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,12 +19,12 @@ public class TestProjectApplicationTests {
 
 	@Autowired private ProjectsService projectsService;
 
-	@Autowired private GithubApiProxy githubApiProxy;
+	@Autowired private RestConsumer restConsumer;
 
 	@Test
 	public void contextLoads() {
 		assertThat(controller).isNotNull();
 		assertThat(projectsService).isNotNull();
-		assertThat(githubApiProxy).isNotNull();
+		assertThat(restConsumer).isNotNull();
 	}
 }

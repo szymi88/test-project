@@ -1,59 +1,63 @@
 package com.sstankiewicz.testproject.controller;
 
 import com.sstankiewicz.testproject.service.ProjectsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/projects")
 public class ProjectsController {
 
-	private ProjectsService projectsService;
+    private ProjectsService projectsService;
 
-	@Autowired
-	public ProjectsController(ProjectsService projectsService) {
-		this.projectsService = projectsService;
-	}
+    private final Logger logger = LoggerFactory.getLogger(ProjectsController.class);
 
-	@GetMapping("/{user}")
-	public ProjectsResponse getProjects(@PathVariable("user") String user) {
-		Optional<Integer> projectsCount;
-		try {
-			projectsCount = projectsService.getProjectsCount(user);
-		} catch (RuntimeException e) {
-			//logger.error("Request: " + req.getRequestURL() + " raised " + ex);
-			throw new ProjectsServiceException(e);
-		}
+    @Autowired
+    public ProjectsController(ProjectsService projectsService) {
+        this.projectsService = projectsService;
+    }
 
+    @GetMapping("/{user}")
+    public ProjectsResponse getProjects(@PathVariable("user") String user) {
+        Optional<Integer> projectsCount;
+        try {
+            projectsCount = projectsService.getProjectsCount(user);
+        } catch (RuntimeException e) {
+            logger.error(String.format("Request for the user: %s failed.", user), e);
+            throw new ProjectsServiceException(e);
+        }
 
-		if (projectsCount.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.");
-		}
+        if (projectsCount.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.");
+        }
 
-		return new ProjectsResponse(user, projectsCount.get());
-	}
+        return new ProjectsResponse(user, projectsCount.get());
+    }
 
-	private class ProjectsResponse {
-		private String user;
-		private int projects;
+    private class ProjectsResponse {
+        private String user;
+        private int projects;
 
-		public ProjectsResponse(String userName, int projects) {
-			this.user = userName;
-			this.projects = projects;
-		}
+        ProjectsResponse(String userName, int projects) {
+            this.user = userName;
+            this.projects = projects;
+        }
 
-		public String getUser() {
-			return user;
-		}
+        public String getUser() {
+            return user;
+        }
 
-		public int getProjects() {
-			return projects;
-		}
-	}
+        public int getProjects() {
+            return projects;
+        }
+    }
 }

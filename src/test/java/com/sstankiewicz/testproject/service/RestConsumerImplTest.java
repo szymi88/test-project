@@ -1,5 +1,6 @@
 package com.sstankiewicz.testproject.service;
 
+import com.sstankiewicz.testproject.service.exception.ConfigurationException;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,16 +18,16 @@ import java.util.Arrays;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
-public class GithubApiProxyImplTest {
+public class RestConsumerImplTest {
 
-	private GithubApiProxy githubApiProxy;
+	private RestConsumer restConsumer;
 
 	@Mock
 	private RestTemplate restTemplate;
 
 	@Before
 	public void setUp() {
-		githubApiProxy = new GithubApiProxyImpl(restTemplate, "http://test.url/users/%s/repos");
+		restConsumer = new RestConsumerImpl(restTemplate, "http://test.url/users/%s/repos");
 	}
 
 	@Test
@@ -35,7 +36,7 @@ public class GithubApiProxyImplTest {
 		Mockito.when(restTemplate.getForObject(new URI("http://test.url/users/valid-user/repos"), List.class))
 				.thenReturn(result);
 
-		Assertions.assertThat(githubApiProxy.getUserRepositories("valid-user")).hasValue(result);
+		Assertions.assertThat(restConsumer.getUserRepositories("valid-user")).hasValue(result);
 	}
 
 	@Test
@@ -44,13 +45,13 @@ public class GithubApiProxyImplTest {
 		Mockito.when(restTemplate.getForObject(new URI("http://test.url/users/invalid-user/repos"), List.class))
 				.thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-		Assertions.assertThat(githubApiProxy.getUserRepositories("invalid-user")).isNotPresent();
+		Assertions.assertThat(restConsumer.getUserRepositories("invalid-user")).isNotPresent();
 	}
 
 	@Test
 	public void wrongUrl() {
 		Assertions
-				.assertThatThrownBy(() -> new GithubApiProxyImpl(restTemplate, "wrongurl").getUserRepositories("invalid-user"))
+				.assertThatThrownBy(() -> new RestConsumerImpl(restTemplate, "wrongurl").getUserRepositories("invalid-user"))
 				.isInstanceOf(ConfigurationException.class);
 	}
 

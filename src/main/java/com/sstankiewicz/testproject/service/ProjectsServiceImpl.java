@@ -9,14 +9,14 @@ import java.util.Optional;
 @Service
 public class ProjectsServiceImpl implements ProjectsService {
 
-	private final GithubApiProxy githubApiProxy;
+	private final RestConsumer restConsumer;
 
 	@Autowired
-	public ProjectsServiceImpl(final GithubApiProxy githubApiProxy) {
-		this.githubApiProxy = githubApiProxy;
+	ProjectsServiceImpl(final RestConsumer restConsumer) {
+		this.restConsumer = restConsumer;
 	}
 
 	public Optional<Integer> getProjectsCount(String user) {
-		return githubApiProxy.getUserRepositories(user).map(List::size);
+		return restConsumer.getUserRepositories(user).map(List::size);
 	}
 }
